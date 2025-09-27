@@ -1,0 +1,221 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Minimal VPC with 4 subnets, IGW, 1x NAT GW (cost-saving), routes, and S3 Gateway Endpoint
+
+Parameters:
+  ProjectTag:
+    Type: String
+    Default: portfolio
+  EnvironmentTag:
+    Type: String
+    Default: Dev
+  OwnerTag:
+    Type: String
+    Default: masaya
+
+  VpcCidr:
+    Type: String
+    Default: 10.20.0.0/16
+
+  PublicSubnet1aCidr:
+    Type: String
+    Default: 10.20.0.0/24
+  PublicSubnet1cCidr:
+    Type: String
+    Default: 10.20.1.0/24
+  PrivateSubnet1aCidr:
+    Type: String
+    Default: 10.20.10.0/24
+  PrivateSubnet1cCidr:
+    Type: String
+    Default: 10.20.11.0/24
+
+  Az1a:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: ap-northeast-1a
+  Az1c:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: ap-northeast-1c
+
+Resources:
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - { Key: Name, Value: portfolio-main-vpc }
+        - { Key: Project, Value: !Ref ProjectTag }
+        - { Key: Environment, Value: !Ref EnvironmentTag }
+        - { Key: Owner, Value: !Ref OwnerTag }
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - { Key: Name, Value: portfolio-igw }
+        - { Key: Project, Value: !Ref ProjectTag }
+        - { Key: Environment, Value: !Ref EnvironmentTag }
+
+  VpcIgwAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Vpc
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet1a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: !Ref PublicSubnet1aCidr
+      AvailabilityZone: !Ref Az1a
+      MapPublicIpOnLaunch: true
+      Tags:
+        - { Key: Name, Value: portfolio-public-1a }
+        - { Key: Project, Value: !Ref ProjectTag }
+        - { Key: Environment, Value: !Ref EnvironmentTag }
+        - { Key: Type, Value: public }
+        - { Key: AZ, Value: apne1a }
+
+  PublicSubnet1c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: !Ref PublicSubnet1cCidr
+      AvailabilityZone: !Ref Az1c
+      MapPublicIpOnLaunch: true
+      Tags:
+        - { Key: Name, Value: portfolio-public-1c }
+        - { Key: Project, Value: !Ref ProjectTag }
+        - { Key: Environment, Value: !Ref EnvironmentTag }
+        - { Key: Type, Value: public }
+        - { Key: AZ, Value: apne1c }
+
+  PrivateSubnet1a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: !Ref PrivateSubnet1aCidr
+      AvailabilityZone: !Ref Az1a
+      MapPublicIpOnLaunch: false
+      Tags:
+        - { Key: Name, Value: portfolio-private-1a }
+        - { Key: Project, Value: !Ref ProjectTag }
+        - { Key: Environment, Value: !Ref EnvironmentTag }
+        - { Key: Type, Value: private }
+        - { Key: AZ, Value: apne1a }
+
+  PrivateSubnet1c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: !Ref PrivateSubnet1cCidr
+      AvailabilityZone: !Ref Az1c
+      MapPublicIpOnLaunch: false
+      Tags:
+        - { Key: Name, Value: portfolio-private-1c }
+        - { Key: Project, Value: !Ref ProjectTag }
+        - { Key: Environment, Value: !Ref EnvironmentTag }
+        - { Key: Type, Value: private }
+        - { Key: AZ, Value: apne1c }
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - { Key: Name, Value: rtb-portfolio-public }
+        - { Key: Project, Value: !Ref ProjectTag }
+        - { Key: Environment, Value: !Ref EnvironmentTag }
+
+  PublicDefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+    DependsOn: VpcIgwAttachment
+
+  PublicSubnet1aAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1a
+
+  PublicSubnet1cAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1c
+
+  NatEip:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - { Key: Name, Value: portfolio-nat-eip }
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatEip.AllocationId
+      SubnetId: !Ref PublicSubnet1a
+      Tags:
+        - { Key: Name, Value: portfolio-nat-main }
+        - { Key: Project, Value: !Ref ProjectTag }
+        - { Key: Environment, Value: !Ref EnvironmentTag }
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - { Key: Name, Value: rtb-portfolio-private }
+        - { Key: Project, Value: !Ref ProjectTag }
+        - { Key: Environment, Value: !Ref EnvironmentTag }
+
+  PrivateDefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+
+  PrivateSubnet1aAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet1a
+
+  PrivateSubnet1cAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet1c
+
+  S3GatewayEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
+      VpcEndpointType: Gateway
+      RouteTableIds:
+        - !Ref PrivateRouteTable
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: "s3:*"
+            Resource:
+              - "arn:aws:s3:::*"
+
+Outputs:
+  VpcId:               { Value: !Ref Vpc }
+  PublicSubnetIds:     { Value: !Join [',', [!Ref PublicSubnet1a, !Ref PublicSubnet1c]] }
+  PrivateSubnetIds:    { Value: !Join [',', [!Ref PrivateSubnet1a, !Ref PrivateSubnet1c]] }
+  InternetGatewayId:   { Value: !Ref InternetGateway }
+  NatGatewayId:        { Value: !Ref NatGateway }
+  PublicRouteTableId:  { Value: !Ref PublicRouteTable }
+  PrivateRouteTableId: { Value: !Ref PrivateRouteTable }
+  S3EndpointId:        { Value: !Ref S3GatewayEndpoint }
