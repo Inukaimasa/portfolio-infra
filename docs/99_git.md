@@ -1,43 +1,43 @@
-# 99_git ? GitHub ‰^—pƒƒ‚
+ï»¿# 99_git ? GitHub é‹ç”¨ãƒ¡ãƒ¢
 
-## ‰Šúİ’èi1‰ñ‚¾‚¯j
+## åˆæœŸè¨­å®šï¼ˆ1å›ã ã‘ï¼‰
 ```bash
 git init
 git remote add origin git@github.com:Inukaimasa/portfolio-infra.git
 
 
-ƒtƒ@ƒCƒ‹’Ç‰ÁEXV
+ãƒ•ã‚¡ã‚¤ãƒ«è¿½åŠ ãƒ»æ›´æ–°
 
 git add .
 git commit -m "add base_output.yaml and docs"
 git push origin main
 
-ƒuƒ‰ƒ“ƒ`‰^—p
+ãƒ–ãƒ©ãƒ³ãƒé‹ç”¨
 
 git checkout -b feature/add-ecs
 git push origin feature/add-ecs
 
 
-‚æ‚­g‚¤Šm”FƒRƒ}ƒ“ƒh
+ã‚ˆãä½¿ã†ç¢ºèªã‚³ãƒãƒ³ãƒ‰
 
 git status
 git log --oneline --graph --decorate
 git branch -a
 
 
-# 0) ”O‚Ì‚½‚ßŒ»İˆÊ’u‚ÆƒŠƒ‚[ƒg/ƒuƒ‰ƒ“ƒ`Šm”F
+# 0) å¿µã®ãŸã‚ç¾åœ¨ä½ç½®ã¨ãƒªãƒ¢ãƒ¼ãƒˆ/ãƒ–ãƒ©ãƒ³ãƒç¢ºèª
 git status
 git remote -v
 git branch
 
-# 1) ƒŠƒ‚[ƒg‚ÌÅV‚ğæ‚è‚Şi‹£‡–h~j
+# 1) ãƒªãƒ¢ãƒ¼ãƒˆã®æœ€æ–°ã‚’å–ã‚Šè¾¼ã‚€ï¼ˆç«¶åˆé˜²æ­¢ï¼‰
 git pull origin main
 
-# 2) •ÏX‚ğ‚·‚×‚ÄƒXƒe[ƒWƒ“ƒO
+# 2) å¤‰æ›´ã‚’ã™ã¹ã¦ã‚¹ãƒ†ãƒ¼ã‚¸ãƒ³ã‚°
 git add -A
 
-# 3) ƒRƒ~ƒbƒgiƒƒbƒZ[ƒW‚Í‚í‚©‚è‚â‚·‚­j
+# 3) ã‚³ãƒŸãƒƒãƒˆï¼ˆãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯ã‚ã‹ã‚Šã‚„ã™ãï¼‰
 git commit -m "docs: add INDEX/DEPLOY/TROUBLESHOOT; scripts for deploy; add base_output.yaml; update README"
 
-# 4) GitHub ‚Ö”½‰f
+# 4) GitHub ã¸åæ˜ 
 git push origin main

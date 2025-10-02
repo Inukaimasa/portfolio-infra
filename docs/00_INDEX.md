@@ -1,44 +1,44 @@
-## ‰½‚ª‚ ‚éH
-- `base.yaml` c ŠwK—p‚Ì‰Šú”Å
-- `base_output.yaml` c Export •t‚«‚ÌÅV”ÅiÀÛ‚Ég‚¤j
+ï»¿## ä½•ãŒã‚ã‚‹ï¼Ÿ
+- `base.yaml` â€¦ å­¦ç¿’ç”¨ã®åˆæœŸç‰ˆ
+- `base_output.yaml` â€¦ Export ä»˜ãã®æœ€æ–°ç‰ˆï¼ˆå®Ÿéš›ã«ä½¿ã†ï¼‰
 
-## g‚¢•û
-- ƒfƒvƒƒCè‡ ¨ `docs/10_deploy.md`
-- ƒgƒ‰ƒuƒ‹ƒVƒ…[ƒg ¨ `docs/90_troubleshoot.md`
+## ä½¿ã„æ–¹
+- ãƒ‡ãƒ—ãƒ­ã‚¤æ‰‹é † â†’ `docs/10_deploy.md`
+- ãƒˆãƒ©ãƒ–ãƒ«ã‚·ãƒ¥ãƒ¼ãƒˆ â†’ `docs/90_troubleshoot.md`
 
-## ‚±‚ÌƒŠƒ|ƒWƒgƒŠ‚Å‚Å‚«‚é‚±‚Æ
-- AWS CloudFormation ‚ğg‚Á‚Ä **Å¬ŒÀ‚ÌVPCŠî”Õ** ‚ğ©“®\’z‚Å‚«‚é
-- Export/Import ‚É‚æ‚èAEC2/ECS/RDS ‚È‚Ç‘¼ƒXƒ^ƒbƒN‚©‚çÄ—˜—p‰Â”\
-- ƒ|[ƒgƒtƒHƒŠƒI‚Æ‚µ‚ÄuİŒvˆÓ}EƒZƒLƒ…ƒŠƒeƒB”z—¶EƒRƒXƒgÅ“K‰»v
+## ã“ã®ãƒªãƒã‚¸ãƒˆãƒªã§ã§ãã‚‹ã“ã¨
+- AWS CloudFormation ã‚’ä½¿ã£ã¦ **æœ€å°é™ã®VPCåŸºç›¤** ã‚’è‡ªå‹•æ§‹ç¯‰ã§ãã‚‹
+- Export/Import ã«ã‚ˆã‚Šã€EC2/ECS/RDS ãªã©ä»–ã‚¹ã‚¿ãƒƒã‚¯ã‹ã‚‰å†åˆ©ç”¨å¯èƒ½
+- ãƒãƒ¼ãƒˆãƒ•ã‚©ãƒªã‚ªã¨ã—ã¦ã€Œè¨­è¨ˆæ„å›³ãƒ»ã‚»ã‚­ãƒ¥ãƒªãƒ†ã‚£é…æ…®ãƒ»ã‚³ã‚¹ãƒˆæœ€é©åŒ–ã€
 
 ---
 
-## \¬—v‘f
+## æ§‹æˆè¦ç´ 
 - VPC (`10.20.0.0/16`)
-- Public Subnet ~2 (ap-northeast-1a/1c)
-- Private Subnet ~2 (ap-northeast-1a/1c)
+- Public Subnet Ã—2 (ap-northeast-1a/1c)
+- Private Subnet Ã—2 (ap-northeast-1a/1c)
 - Internet Gateway
-- NAT Gateway (ÈƒRƒXƒg\¬A1‘ä‚Ì‚İ)
+- NAT Gateway (çœã‚³ã‚¹ãƒˆæ§‹æˆã€1å°ã®ã¿)
 - Route Tables (Public/Private)
 - S3 Gateway Endpoint
 
 ---
 
-## İŒvƒ|ƒCƒ“ƒg
-- **ƒRƒXƒg”z—¶** : NAT‚Í1‘äAS3‚ÍGateway Endpoint‚Å“]‘——¿‚ğíŒ¸  
-- **ƒZƒLƒ…ƒŠƒeƒB** : ƒAƒvƒŠ/DB‚ÍPrivateƒTƒuƒlƒbƒg‚É”z’uA’¼ÚŠO•”ƒAƒNƒZƒX•s‰Â  
-- **ç’·«** : ƒTƒuƒlƒbƒg‚ğ2AZ‚É•ªŠ„‚µ‚Ä‰Â—p«‚ğŠm•Û  
-- **Ä—˜—p«** : CloudFormation‚ÌOutputs‚ğExport‚µA‘¼ƒXƒ^ƒbƒN‚©‚çImport‰Â”\  
+## è¨­è¨ˆãƒã‚¤ãƒ³ãƒˆ
+- **ã‚³ã‚¹ãƒˆé…æ…®** : NATã¯1å°ã€S3ã¯Gateway Endpointã§è»¢é€æ–™ã‚’å‰Šæ¸›  
+- **ã‚»ã‚­ãƒ¥ãƒªãƒ†ã‚£** : ã‚¢ãƒ—ãƒª/DBã¯Privateã‚µãƒ–ãƒãƒƒãƒˆã«é…ç½®ã€ç›´æ¥å¤–éƒ¨ã‚¢ã‚¯ã‚»ã‚¹ä¸å¯  
+- **å†—é•·æ€§** : ã‚µãƒ–ãƒãƒƒãƒˆã‚’2AZã«åˆ†å‰²ã—ã¦å¯ç”¨æ€§ã‚’ç¢ºä¿  
+- **å†åˆ©ç”¨æ€§** : CloudFormationã®Outputsã‚’Exportã—ã€ä»–ã‚¹ã‚¿ãƒƒã‚¯ã‹ã‚‰Importå¯èƒ½  
 
 ---
 
-## ¡Œã‚ÌŠg’£—\’è
-- ALB + EC2/ECS ‚ğ’Ç‰Á‚µ‚ÄWebƒAƒvƒŠ\¬‚ÉŠg’£  
-- RDS Multi-AZ ‚Ì’Ç‰Á  
-- Terraform ”Å‚Å‚ÌÀ‘•  
+## ä»Šå¾Œã®æ‹¡å¼µäºˆå®š
+- ALB + EC2/ECS ã‚’è¿½åŠ ã—ã¦Webã‚¢ãƒ—ãƒªæ§‹æˆã«æ‹¡å¼µ  
+- RDS Multi-AZ ã®è¿½åŠ   
+- Terraform ç‰ˆã§ã®å®Ÿè£…  
 
 ---
 
-## ŠÖ˜Aƒy[ƒW
-- [10_deploy.md](10_deploy.md) : ÀÛ‚ÌƒfƒvƒƒCè‡  
-- [90_troubleshoot.md](90_troubleshoot.md) : ‚æ‚­‚ ‚éƒGƒ‰[‚Æ‘Îˆ–@
+## é–¢é€£ãƒšãƒ¼ã‚¸
+- [10_deploy.md](10_deploy.md) : å®Ÿéš›ã®ãƒ‡ãƒ—ãƒ­ã‚¤æ‰‹é †  
+- [90_troubleshoot.md](90_troubleshoot.md) : ã‚ˆãã‚ã‚‹ã‚¨ãƒ©ãƒ¼ã¨å¯¾å‡¦æ³•

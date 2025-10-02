@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 (Amazon Linux 2, t2.micro) in existing VPC with Elastic IP
+
+Parameters:
+  EnvironmentTag:
+    Type: String
+    Default: Dev
+    Description: Must match the EnvironmentTag used by the network stack (e.g., Dev)
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: awskey
+    Description: Existing EC2 KeyPair name (DO NOT put .pem path here)
+
+  AllowedSSHLocation:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: CIDR allowed to SSH (e.g., 203.0.113.10/32). Change from 0.0.0.0/0 for security
+
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+    Description: Amazon Linux 2 AMI via SSM Parameter
+
+Resources:
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH from AllowedSSHLocation
+      VpcId: !ImportValue
+        'Fn::Sub': '${EnvironmentTag}-VpcId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref AllowedSSHLocation
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentTag}-ec2-sg'
+
+  Ec2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !Ref LatestAmiId
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          AssociatePublicIpAddress: true
+          # 蜈医↓菴懊▲縺溘ロ繝・ヨ繝ｯ繝ｼ繧ｯ繧ｹ繧ｿ繝・け縺ｮ縲悟句挨Export縲阪ｒ菴ｿ縺・ｼ・ublicSubnet1Id・・
+          SubnetId: !ImportValue
+            'Fn::Sub': '${EnvironmentTag}-PublicSubnet1Id'
+          GroupSet:
+            - !Ref InstanceSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentTag}-ec2'
+
+  Ec2Eip:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref Ec2Instance
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentTag}-ec2-eip'
+
+Outputs:
+  InstanceId:
+    Description: EC2 Instance ID
+    Value: !Ref Ec2Instance
+  ElasticIp:
+    Description: Elastic IP attached to the instance
+    Value: !Ref Ec2Eip
+  PublicDnsName:
+    Description: Public DNS (may resolve after a short delay)
+    Value: !GetAtt Ec2Instance.PublicDnsName
+  SshCommandExample:
+    Description: Example ssh command (edit path if needed)
+    Value: !Sub 'ssh -i "C:/Users/user/Desktop/繧ｨ繝ｳ繧ｸ繝九い/aws/awskey.pem" ec2-user@${Ec2Eip}'

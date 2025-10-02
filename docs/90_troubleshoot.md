@@ -1,44 +1,77 @@
+ï»¿### ç—‡çŠ¶
+
+- GitHub ä¸Šã§æ—¥æœ¬èªãŒæ–‡å­—åŒ–ã‘ã—ã¦è¡¨ç¤ºã•ã‚Œã‚‹
+- åŸå› : ä¿å­˜æ™‚ã« Shift_JIS ã‚„ UTF-16 ã§ä¿å­˜ã•ã‚Œã¦ã„ãŸ
+
+#### PowerShell ã§ä¸€æ‹¬å¤‰æ›ï¼ˆUTF-8ï¼‰
+
+````powershell
+# docs ãƒ•ã‚©ãƒ«ãƒ€å†…ã§å®Ÿè¡Œã™ã‚‹
+Get-ChildItem -Filter *.md | ForEach-Object {
+  $content = Get-Content $_.FullName
+  Set-Content -Path $_.FullName -Value $content -Encoding UTF8
+
+
+
+
 An error occurred (AccessDenied) when calling the ValidateTemplate operation
 
-- IAM ƒ†[ƒU[‚ÉŒ ŒÀ•s‘«
-- ‘Îô: `AdministratorAccess` ‚Ü‚½‚Í­‚È‚­‚Æ‚à `AWSCloudFormationFullAccess` ‚ğ•t—^
+- IAM ãƒ¦ãƒ¼ã‚¶ãƒ¼ã«æ¨©é™ä¸è¶³
+- å¯¾ç­–: `AdministratorAccess` ã¾ãŸã¯å°‘ãªãã¨ã‚‚ `AWSCloudFormationFullAccess` ã‚’ä»˜ä¸
 
 ---
 
 ## Template format error: unsupported structure
-- YAML ‚ÌƒCƒ“ƒfƒ“ƒgƒ~ƒX‚ªŒ´ˆö
-- `Export` ‚Í•K‚¸ `Value` ‚Ì‰º‚É‘µ‚¦‚é
-- VS Code ‚Å YAML Linter ‚ğ—˜—p‚·‚é‚Æ—Ç‚¢
+- YAML ã®ã‚¤ãƒ³ãƒ‡ãƒ³ãƒˆãƒŸã‚¹ãŒåŸå› 
+- `Export` ã¯å¿…ãš `Value` ã®ä¸‹ã«æƒãˆã‚‹
+- VS Code ã§ YAML Linter ã‚’åˆ©ç”¨ã™ã‚‹ã¨è‰¯ã„
 
 ---
 
-## UTF-8 / •¶šƒR[ƒh–â‘è
+## UTF-8 / æ–‡å­—ã‚³ãƒ¼ãƒ‰å•é¡Œ
 
 
 Error parsing parameter '--template-body'
 
-- •Û‘¶‚Ì•¶šƒR[ƒh‚ª `UTF-8 (BOM‚È‚µ)` ‚Å‚È‚¢
-- ‘Îô: VS Code ¨ u–¼‘O‚ğ•t‚¯‚Ä•Û‘¶v ¨ ƒGƒ“ƒR[ƒh‚Å `UTF-8` ‚ğ‘I‘ğ
+- ä¿å­˜æ™‚ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰ãŒ `UTF-8 (BOMãªã—)` ã§ãªã„
+- å¯¾ç­–: VS Code â†’ ã€Œåå‰ã‚’ä»˜ã‘ã¦ä¿å­˜ã€ â†’ ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ã§ `UTF-8` ã‚’é¸æŠ
 
 ---
 
-## Export–¼‚Ìd•¡
+## Exportåã®é‡è¤‡
 
 
 Export with name Dev-VpcId is already exported
 
-- Šù‘¶ƒXƒ^ƒbƒN‚ÆExport–¼‚ªÕ“Ë‚µ‚Ä‚¢‚é
-- ‘Îô:
-  - `EnvironmentTag` ‚ğ `Stg` ‚È‚Ç‚É•ÏX
-  - ‚Ü‚½‚ÍŒÃ‚¢ƒXƒ^ƒbƒN‚ğíœ
+- æ—¢å­˜ã‚¹ã‚¿ãƒƒã‚¯ã¨ExportåãŒè¡çªã—ã¦ã„ã‚‹
+- å¯¾ç­–:
+  - `EnvironmentTag` ã‚’ `Stg` ãªã©ã«å¤‰æ›´
+  - ã¾ãŸã¯å¤ã„ã‚¹ã‚¿ãƒƒã‚¯ã‚’å‰Šé™¤
 
 ---
 
-## cfn-lint ‚Å‚Ì–‘Oƒ`ƒFƒbƒN
+## cfn-lint ã§ã®äº‹å‰ãƒã‚§ãƒƒã‚¯
 ```bash
 pip install cfn-lint
 cfn-lint -t base_output.yaml --region ap-northeast-1
 
+#ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆæ¤œè¨¼
+aws cloudformation validate-template --template-body file://ec2.yaml
 
+Get-Content ec2.yaml | Set-Content -Encoding utf8 ec2_fixed.yaml
+
+#ä¸Šè¨˜ã§ã†ã¾ãã„ã‹ãªã„å ´åˆ â€œä»Šã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰â€ã‚’ç¢ºèª
+
+$bytes = Get-Content .\ec2_fixed.yaml -Encoding Byte -TotalCount 4
+$bytes
+
+#ãƒ†ã‚­ã‚¹ãƒˆã§é–‹ã„ã¦utf-8ã«ã™ã‚‹ã€‚
+#ä¿®æ­£å¾Œ
+aws cloudformation validate-template --template-body file://ec2.yaml
+
+````
+
+#ä»Šã‚ã‚‹ã‚¹ã‚¿ãƒƒã‚¯ã®ä¸€è¦§ã®ç¢ºèª
+aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE
 
 

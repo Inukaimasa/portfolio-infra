@@ -1,28 +1,28 @@
-# 10_deploy  ƒfƒvƒƒCè‡
+ï»¿# 10_deploy  ãƒ‡ãƒ—ãƒ­ã‚¤æ‰‹é †
 
-## ‘O’ñğŒ
-- AWS CLI v2 ƒCƒ“ƒXƒg[ƒ‹Ï‚İ
-- `aws configure` Ï‚İiregion ‚Í `ap-northeast-1`j
-- `base_output.yaml` ‚ªƒŠƒ|ƒWƒgƒŠ’¼‰º‚É‚ ‚é‚±‚Æ
+## å‰ææ¡ä»¶
+- AWS CLI v2 ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ¸ˆã¿
+- `aws configure` æ¸ˆã¿ï¼ˆregion ã¯ `ap-northeast-1`ï¼‰
+- `base_output.yaml` ãŒãƒªãƒã‚¸ãƒˆãƒªç›´ä¸‹ã«ã‚ã‚‹ã“ã¨
 
 ---
 
-## 1. \•¶ƒ`ƒFƒbƒN
+## 1. æ§‹æ–‡ãƒã‚§ãƒƒã‚¯
 ```bash
 aws cloudformation validate-template --template-body file://base_output.yaml
 
 
-2. ƒfƒvƒƒCiì¬ or XVj
+2. ãƒ‡ãƒ—ãƒ­ã‚¤ï¼ˆä½œæˆ or æ›´æ–°ï¼‰
 aws cloudformation deploy \
   --stack-name net-dev \
   --template-file base_output.yaml \
   --no-fail-on-empty-changeset \
   --region ap-northeast-1
 
-3. Export Šm”F
+3. Export ç¢ºèª
 aws cloudformation list-exports --output table
 
-4. íœ
+4. å‰Šé™¤
 
 aws cloudformation delete-stack --stack-name net-dev
 aws cloudformation wait stack-delete-complete --stack-name net-dev
