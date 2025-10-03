@@ -1,0 +1,11 @@
+﻿# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Credentials / 秘密鍵
+*.pem
+*.ppk
+
+# 一時ファイル
+*.zip

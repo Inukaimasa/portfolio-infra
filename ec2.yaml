@@ -22,6 +22,16 @@ Parameters:
     Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
     Description: Amazon Linux 2 AMI via SSM Parameter
 
+  WpUserData:
+    Type: String
+    Default: |
+      #!/bin/bash
+      set -eux
+      yum -y update
+      yum -y install httpd mariadb-server php php-mysqlnd php-fpm php-json php-mbstring php-xml php-gd unzip curl
+      systemctl enable --now httpd mariadb
+      systemctl restart httpd
+
 Resources:
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -34,6 +44,10 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: !Ref AllowedSSHLocation
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value: !Sub "${EnvironmentTag}-ec2-sg"
@@ -51,6 +65,9 @@ Resources:
             "Fn::Sub": "${EnvironmentTag}-PublicSubnet1Id"
           GroupSet:
             - !Ref InstanceSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          ${WpUserData}
       Tags:
         - Key: Name
           Value: !Sub "${EnvironmentTag}-ec2"
