@@ -1,0 +1,23 @@
+# ===============================
+# pre-commit 設定ファイル
+# CloudFormationテンプレート (.yaml / .yml) の自動Lint用
+# ===============================
+
+repos:
+  - repo: https://github.com/aws-cloudformation/cfn-python-lint
+    rev: "v1.40.0"
+
+    #使用バージョン　新版は https://github.com/aws-cloudformation/cfn-python-lint/releases で確認可能）
+    hooks:
+      - id: cfn-lint
+        name: CloudFormation Linter
+        entry: cfn-lint
+        language: python
+        types: [yaml]
+        files: ^templates/.*\.ya?ml$  
+        # オプション設定
+        # args:
+        #   - "--template"
+        #   - "."
+        # 複数ファイル構成を想定したワークディレクトリ対応
+        # pass_filenames: false
