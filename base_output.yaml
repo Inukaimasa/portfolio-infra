@@ -28,13 +28,20 @@ Parameters:
   PrivateSubnet1cCidr:
     Type: String
     Default: 10.20.11.0/24
-
-  Az1a:
-    Type: AWS::EC2::AvailabilityZone::Name
-    Default: ap-northeast-1a
-  Az1c:
-    Type: AWS::EC2::AvailabilityZone::Name
-    Default: ap-northeast-1c
+  #追加
+  MonitoringSubnet1dCidr:
+    Type: String
+    Default: 10.20.30.0/24
+  # !Selectで取得するため不要
+  # Az1a:
+  #   Type: AWS::EC2::AvailabilityZone::Name
+  #   Default: ap-northeast-1a
+  # Az1c:
+  #   Type: AWS::EC2::AvailabilityZone::Name
+  #   Default: ap-northeast-1c
+  # Az1d:
+  #   Type: AWS::EC2::AvailabilityZone::Name
+  #   Default: ap-northeast-1d
 
 Resources:
   Vpc:
@@ -68,7 +75,8 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock: !Ref PublicSubnet1aCidr
-      AvailabilityZone: !Ref Az1a
+      # AvailabilityZone: !Ref Az1a
+      AvailabilityZone: !Select [0, !GetAZs ""]
       MapPublicIpOnLaunch: true
       Tags:
         - { Key: Name, Value: portfolio-public-1a }
@@ -82,7 +90,8 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock: !Ref PublicSubnet1cCidr
-      AvailabilityZone: !Ref Az1c
+      #AvailabilityZone: !Ref Az1c
+      AvailabilityZone: !Select [1, !GetAZs ""]
       MapPublicIpOnLaunch: true
       Tags:
         - { Key: Name, Value: portfolio-public-1c }
@@ -96,7 +105,8 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock: !Ref PrivateSubnet1aCidr
-      AvailabilityZone: !Ref Az1a
+      #AvailabilityZone: !Ref Az1a
+      AvailabilityZone: !Select [0, !GetAZs ""]
       MapPublicIpOnLaunch: false
       Tags:
         - { Key: Name, Value: portfolio-private-1a }
@@ -110,7 +120,8 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock: !Ref PrivateSubnet1cCidr
-      AvailabilityZone: !Ref Az1c
+      #AvailabilityZone: !Ref Az1c
+      AvailabilityZone: !Select [1, !GetAZs ""]
       MapPublicIpOnLaunch: false
       Tags:
         - { Key: Name, Value: portfolio-private-1c }
@@ -118,6 +129,21 @@ Resources:
         - { Key: Environment, Value: !Ref EnvironmentTag }
         - { Key: Type, Value: private }
         - { Key: AZ, Value: apne1c }
+
+  MonitoringSubnet1d:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: !Ref MonitoringSubnet1dCidr
+      #AvailabilityZone: !Ref Az1d　冗長化の為修正
+      AvailabilityZone: !Select [2, !GetAZs ""]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - { Key: Name, Value: portfolio-monitoring-1d }
+        - { Key: Project, Value: !Ref ProjectTag }
+        - { Key: Environment, Value: !Ref EnvironmentTag }
+        - { Key: Type, Value: monitoring }
+        - { Key: AZ, Value: apne1d }
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -148,22 +174,22 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet1c
 
-  NatEip:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-      Tags:
-        - { Key: Name, Value: portfolio-nat-eip }
+  # NatEip:
+  #   Type: AWS::EC2::EIP
+  #   Properties:
+  #     Domain: vpc
+  #     Tags:
+  #       - { Key: Name, Value: portfolio-nat-eip }
 
-  NatGateway:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt NatEip.AllocationId
-      SubnetId: !Ref PublicSubnet1a
-      Tags:
-        - { Key: Name, Value: portfolio-nat-main }
-        - { Key: Project, Value: !Ref ProjectTag }
-        - { Key: Environment, Value: !Ref EnvironmentTag }
+  # NatGateway:
+  #   Type: AWS::EC2::NatGateway
+  #   Properties:
+  #     AllocationId: !GetAtt NatEip.AllocationId
+  #     SubnetId: !Ref PublicSubnet1a
+  #     Tags:
+  #       - { Key: Name, Value: portfolio-nat-main }
+  #       - { Key: Project, Value: !Ref ProjectTag }
+  #       - { Key: Environment, Value: !Ref EnvironmentTag }
 
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
@@ -174,12 +200,12 @@ Resources:
         - { Key: Project, Value: !Ref ProjectTag }
         - { Key: Environment, Value: !Ref EnvironmentTag }
 
-  PrivateDefaultRoute:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NatGateway
+  # PrivateDefaultRoute:
+  #   Type: AWS::EC2::Route
+  #   Properties:
+  #     RouteTableId: !Ref PrivateRouteTable
+  #     DestinationCidrBlock: 0.0.0.0/0
+  #     NatGatewayId: !Ref NatGateway
 
   PrivateSubnet1aAssoc:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -192,6 +218,12 @@ Resources:
     Properties:
       RouteTableId: !Ref PrivateRouteTable
       SubnetId: !Ref PrivateSubnet1c
+  #追加 “ルートテーブル関連付け”
+  MonitoringSubnet1dAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref MonitoringSubnet1d
 
   S3GatewayEndpoint:
     Type: AWS::EC2::VPCEndpoint
@@ -235,11 +267,16 @@ Outputs:
       Name: !Sub "${EnvironmentTag}-PrivateSubnet2Id"
   InternetGatewayId:
     Value: !Ref InternetGateway
-  NatGatewayId:
-    Value: !Ref NatGateway
+  # NatGatewayId:
+  #   Value: !Ref NatGateway
   PublicRouteTableId:
     Value: !Ref PublicRouteTable
   PrivateRouteTableId:
     Value: !Ref PrivateRouteTable
   S3EndpointId:
     Value: !Ref S3GatewayEndpoint
+  #追加 zabbix用
+  MonitoringSubnet1Id:
+    Value: !Ref MonitoringSubnet1d
+    Export:
+      Name: !Sub "${EnvironmentTag}-MonitoringSubnet1Id"
